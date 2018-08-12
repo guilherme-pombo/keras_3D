@@ -2,7 +2,7 @@ import argparse
 
 from keras import optimizers
 
-from .multiview_models import concat_resnet
+from .multiview_models import concat_resnet, mvcnn
 from .generator import MultiViewGen
 
 # These are hardcoded since the dataset is always the same and I'm lazy
@@ -18,6 +18,10 @@ def train(model_type, batch_size, epochs):
                               target_size=TARGET_SIZE,
                               num_images=NUM_VIEWS,
                               num_classes=NUM_CLASSES)
+    elif model_type == 'mvcnn':
+        model = mvcnn(target_size=TARGET_SIZE,
+                      num_images=NUM_VIEWS,
+                      num_classes=NUM_CLASSES)
     else:
         raise NotImplementedError("Other versions of multiview are not yet implemented")
     print(model.summary())
