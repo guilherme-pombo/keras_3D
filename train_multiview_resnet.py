@@ -2,7 +2,7 @@ import argparse
 
 from keras import optimizers
 
-from .multiview_models import concat_resnet, mvcnn
+from .multiview_models import resnet_mvcnn
 from .generator import MultiViewGen
 
 # These are hardcoded since the dataset is always the same and I'm lazy
@@ -13,22 +13,17 @@ NUM_VIEWS = 12
 
 def train(model_type, batch_size, epochs):
     # concat_view resnet
-    if model_type == 'concat':
-        model = concat_resnet(stop_layer=-1,
-                              target_size=TARGET_SIZE,
-                              num_images=NUM_VIEWS,
-                              num_classes=NUM_CLASSES)
-    elif model_type == 'mvcnn':
-        model = mvcnn(target_size=TARGET_SIZE,
-                      num_images=NUM_VIEWS,
-                      num_classes=NUM_CLASSES)
+    if model_type == 'mvcnn':
+        model = resnet_mvcnn(target_size=TARGET_SIZE,
+                             num_images=NUM_VIEWS,
+                             num_classes=NUM_CLASSES)
     else:
         raise NotImplementedError("Other versions of multiview are not yet implemented")
     print(model.summary())
 
     # SGD
     model.compile(loss='categorical_crossentropy',
-                  optimizer=optimizers.SGD(lr=1e-4, momentum=0.9),
+                  optimizer=optimizers.Adam(lr=0.001, beta_1=0.9, beta_2=0.999),
                   metrics=['accuracy'])
 
     # generators
@@ -53,4 +48,4 @@ if __name__ == '__main__':
 
     args = parser.parse_args()
 
-    train(batch_size=args.batch_size, epochs=args.epochs)
+    train(args.model_type, batch_size=args.batch_size, epochs=args.epochs)
